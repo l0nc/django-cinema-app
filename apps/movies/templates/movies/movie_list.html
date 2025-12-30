@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-12">
+    <h1 class="text-5xl font-black text-white uppercase tracking-tighter mb-2">{{ page_title }}</h1>
+    <p class="text-gray-500 text-lg">Премьеры и классика в одном месте</p>
+</div>
+
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8">
+    {% for item in content_list %}
+        {% include 'movies/includes/movie_card.html' with movie=item %}
+    {% empty %}
+        <div class="col-span-full py-20 text-center">
+            <p class="text-gray-500 text-2xl mb-4">Ничего не найдено 🍿</p>
+            <a href="{% url 'home' %}" class="text-orange-500 font-bold hover:text-orange-400 underline decoration-2 underline-offset-4">Вернуться к новинкам</a>
+        </div>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<div class="mt-16 flex justify-center items-center gap-4">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+           class="w-12 h-12 flex items-center justify-center bg-gray-800 rounded-xl hover:bg-gray-700 text-white transition-colors">←</a>
+    {% endif %}
+    <span class="text-gray-400 font-bold">Страница {{ page_obj.number }}</span>
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+           class="w-12 h-12 flex items-center justify-center bg-gray-800 rounded-xl hover:bg-gray-700 text-white transition-colors">→</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

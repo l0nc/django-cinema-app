@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ movie.name }}{% endblock %}
+
+{% block content %}
+<div class="flex flex-col lg:flex-row gap-12 mt-6">
+    <div class="w-full lg:w-[400px] flex-shrink-0">
+        <div class="sticky top-28">
+            <div class="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-800">
+                {% if movie.poster %}
+                    <img src="{{ movie.poster.url }}" alt="{{ movie.name }}" class="w-full h-auto object-cover">
+                {% endif %}
+                <div class="absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-black to-transparent">
+                    <button class="w-full bg-orange-600 hover:bg-orange-700 text-white font-black py-4 rounded-2xl transition-all uppercase tracking-widest shadow-lg shadow-orange-900/40">
+                        Смотреть онлайн
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-1">
+        <div class="mb-10">
+            <h1 class="text-6xl font-black text-white tracking-tighter mb-4 leading-tight">{{ movie.name }}</h1>
+            <div class="flex items-center gap-6 text-gray-400 font-bold uppercase text-sm tracking-widest">
+                <span>{{ movie.release_year }}</span>
+                <span class="w-1.5 h-1.5 bg-gray-700 rounded-full"></span>
+                <span class="text-orange-500">{{ movie.get_type_display }}</span>
+                <span class="w-1.5 h-1.5 bg-gray-700 rounded-full"></span>
+                <span>{{ movie.duration }} мин.</span>
+            </div>
+        </div>
+
+        <div class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">О чем сюжет</h2>
+            <p class="text-gray-400 text-xl leading-relaxed">{{ movie.description }}</p>
+        </div>
+
+        <style>
+            [x-cloak] { display: none !important; }
+        </style>
+
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-800/30 p-8 rounded-3xl border border-gray-800">
+    
+            <div class="space-y-10">
+                <div>
+                    <span class="block text-gray-500 text-xs font-black uppercase mb-4 tracking-widest">Жанры</span>
+                    <div class="flex flex-wrap gap-2">
+                        {% for genre in movie.genres.all %}
+                            <a href="{% url 'home' %}?genre={{ genre.slug }}" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-xl text-sm transition-colors border border-gray-700">
+                                {{ genre.name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+        
+                <div>
+                    <span class="block text-gray-500 text-xs font-black uppercase mb-4 tracking-widest">Режиссеры</span>
+                    <div class="flex flex-wrap gap-4">
+                        {% for d in movie.directors.all %}
+                        <div x-data="{ open: false }" class="relative inline-block">
+                            <span @mouseenter="open = true" @mouseleave="open = false" 
+                                  class="text-white font-bold border-b border-dashed border-gray-600 cursor-help hover:text-orange-500 transition-colors">
+                                {{ d.name }}{% if not forloop.last %}, {% endif %}
+                            </span>
+        
+                            <div x-show="open" 
+                                 x-cloak 
+                                 x-transition.opacity
+                                 class="absolute z-50 bottom-full mb-12 left-1/2 -translate-x-1/2 w-64 bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl p-5 pt-10 pointer-events-none">
+                                
+                                <div class="absolute -top-8 left-1/2 -translate-x-1/2">
+                                    <div class="w-16 h-16 rounded-full border-4 border-orange-500 overflow-hidden shadow-2xl bg-gray-800">
+                                        {% if d.photo %}
+                                            <img src="{{ d.photo.url }}" class="w-full h-full object-cover">
+                                        {% else %}
+                                            <div class="w-full h-full flex items-center justify-center text-gray-600 text-[10px] font-bold">НЕТ ФОТО</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+        
+                                <div class="text-center">
+                                    <p class="text-white font-black text-base uppercase tracking-tight">{{ d.name }}</p>
+                                    <div class="w-8 h-0.5 bg-orange-500 mx-auto my-2"></div>
+                                    <p class="text-gray-400 text-xs leading-relaxed line-clamp-3 italic">
+                                        {{ d.bio|default:"Биография уточняется..." }}
+                                    </p>
+                                </div>
+                                
+                                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-gray-900 border-r border-b border-gray-700 transform rotate-45"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        
+            <div class="space-y-10 md:border-l md:border-gray-800 md:pl-8">
+                <div>
+                    <span class="block text-gray-500 text-xs font-black uppercase mb-4 tracking-widest">В главных ролях</span>
+                    <div class="flex flex-wrap gap-x-6 gap-y-5">
+                        {% for actor in movie.actors.all %}
+                        <div x-data="{ open: false }" class="relative inline-block">
+                            <span @mouseenter="open = true" @mouseleave="open = false" 
+                                  class="text-gray-200 font-bold border-b border-dashed border-gray-700 cursor-help hover:text-orange-500 transition-colors">
+                                {{ actor.name }}{% if not forloop.last %}, {% endif %}
+                            </span>
+        
+                            <div x-show="open" 
+                                 x-cloak 
+                                 x-transition.opacity
+                                 class="absolute z-50 bottom-full mb-12 left-1/2 -translate-x-1/2 w-64 bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl p-5 pt-10 pointer-events-none">
+                                
+                                <div class="absolute -top-8 left-1/2 -translate-x-1/2">
+                                    <div class="w-16 h-16 rounded-full border-4 border-orange-500 overflow-hidden shadow-2xl bg-gray-800">
+                                        {% if actor.photo %}
+                                            <img src="{{ actor.photo.url }}" class="w-full h-full object-cover">
+                                        {% else %}
+                                            <div class="w-full h-full flex items-center justify-center text-gray-600 text-[10px] font-bold">НЕТ ФОТО</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+        
+                                <div class="text-center">
+                                    <p class="text-white font-black text-base uppercase tracking-tight">{{ actor.name }}</p>
+                                    <div class="w-8 h-0.5 bg-orange-500 mx-auto my-2"></div>
+                                    <p class="text-gray-400 text-xs leading-relaxed line-clamp-3">
+                                        {{ actor.bio|default:"Биография уточняется..." }}
+                                    </p>
+                                </div>
+                                
+                                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-gray-900 border-r border-b border-gray-700 transform rotate-45"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-20 border-t border-gray-800 pt-10">
+    <div class="flex items-center justify-between mb-10">
+        <h3 class="text-3xl font-black text-white uppercase tracking-tighter">
+            Отзывы <span class="text-orange-500 ml-2">{{ movie.reviews.count }}</span>
+        </h3>
+        <button class="bg-gray-800 hover:bg-gray-700 text-white px-6 py-2 rounded-xl font-bold text-sm transition-all border border-gray-700">
+            Написать отзыв
+        </button>
+    </div>
+
+    <div class="space-y-6">
+        {% for review in movie.reviews.all %}
+        <div class="bg-gray-800/20 border border-gray-800 p-6 rounded-3xl relative">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-orange-600 rounded-full flex items-center justify-center font-bold text-white">
+                        {{ review.user.username|slice:":1"|upper }}
+                    </div>
+                    <div>
+                        <p class="text-white font-bold text-sm">{{ review.user.username }}</p>
+                        <p class="text-gray-500 text-[10px] uppercase font-bold">{{ review.created_at|date:"d E Y" }}</p>
+                    </div>
+                </div>
+                <div class="bg-orange-500/10 border border-orange-500/20 px-3 py-1 rounded-lg">
+                    <span class="text-orange-500 font-black">{{ review.rating }}/10</span>
+                </div>
+            </div>
+            <p class="text-gray-400 leading-relaxed italic">"{{ review.text }}"</p>
+        </div>
+        {% empty %}
+            <div class="text-center py-10 bg-gray-800/10 rounded-3xl border border-dashed border-gray-800">
+                <p class="text-gray-500">Пока нет ни одного отзыва. Станьте первым!</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
