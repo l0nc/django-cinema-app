@@ -24,7 +24,7 @@ PYTHON PROJECT DJANGO CINEMA SITE - DJANGO MOVIE WATCH SITE
 Управление пользователями и правами доступа
 
 🛠️ Технологический стек
-Backend: Django 4.2, Django REST Framework
+Backend: Django 6.0, Django REST Framework
 Frontend: Tailwind, htmx
 База данных: PostgreSQL или sqlite3
 Поиск: Django ORM, PostgreSQL
