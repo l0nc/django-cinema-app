@@ -30,8 +30,7 @@ class Person(AutoSlugMixin, TimeStampedModel):
         return self.name
 
 
-class Movie(AutoSlugMixin, TimeStampedModel):
-    
+class Content(AutoSlugMixin, TimeStampedModel):
     MOVIE = 'movie'
     SERIES = 'series'
     TYPE_CHOICES = [

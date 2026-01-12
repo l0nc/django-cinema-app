@@ -1,11 +1,17 @@
 from django.views.generic import ListView, DetailView
 from django.db.models import Q
 from django.shortcuts import redirect
-from .models import Movie
-from .forms import * 
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from .models import Content
+from .forms import *
+from .serializers import ContentSerializer
 
 class ContentListView(ListView):
-    model = Movie
+    model = Content
     template_name = 'movies/movie_list.html'
     context_object_name = 'content_list'
     paginate_by = 12
@@ -20,7 +26,7 @@ class ContentListView(ListView):
     }
     
     def get_queryset(self):
-        queryset = Movie.objects.all()
+        queryset = Content.objects.all()
         
         if 'series' in self.request.path:
             queryset = queryset.series()
@@ -48,13 +54,14 @@ class ContentListView(ListView):
         return context
     
 class MovieDetailView(DetailView):
-    model = Movie
+    model = Content
     template_name = 'movies/movie_detail.html'
     context_object_name = 'movie'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['review_form'] = ReviewForm()
+        if 'review_form' not in context:
+            context['review_form'] = ReviewForm()
         return context
     
     """Запрос типа POST"""
@@ -81,3 +88,8 @@ class MovieDetailView(DetailView):
             return redirect('movie_detail', slug=self.object.slug)
         return self.render_to_response(self.get_context_data(review_form=review_form))
             
+class TempContentDetailView(generics.RetrieveAPIView):
+    queryset = Content.objects.all()
+    serializer_class = ContentSerializer
+    
+    

@@ -1,11 +1,13 @@
 from django.db import models
 from apps.core.models import TimeStampedModel
 from config.settings import AUTH_USER_MODEL
-from apps.movies.models import Movie
+from apps.movies.models import Content
+from django.core.validators import MaxLengthValidator
 
 class Review(TimeStampedModel):
+    title = models.CharField(default='Без названия', max_length=150, verbose_name='Заголовок')
     movie = models.ForeignKey(
-        Movie,
+        Content,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Контент'
@@ -16,7 +18,7 @@ class Review(TimeStampedModel):
         related_name='reviews',
         verbose_name='Автор'
     )
-    text = models.TextField(verbose_name='Текст отзыва')
+    text = models.TextField(validators=[MaxLengthValidator(15000)], verbose_name='Текст отзыва')
     rating = models.PositiveSmallIntegerField(
         verbose_name='Оценка',
         choices=[(i, str(i)) for i in range(1, 11)]

@@ -1,33 +1,96 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="mb-12">
-    <h1 class="text-5xl font-black text-white uppercase tracking-tighter mb-2">{{ page_title }}</h1>
-    <p class="text-gray-500 text-lg">Премьеры и классика в одном месте</p>
-</div>
-
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8">
-    {% for item in content_list %}
-        {% include 'movies/includes/movie_card.html' with movie=item %}
-    {% empty %}
-        <div class="col-span-full py-20 text-center">
-            <p class="text-gray-500 text-2xl mb-4">Ничего не найдено 🍿</p>
-            <a href="{% url 'home' %}" class="text-orange-500 font-bold hover:text-orange-400 underline decoration-2 underline-offset-4">Вернуться к новинкам</a>
+<div class="selection:bg-indigo-500/30 pb-20">
+    
+    <div class="relative pt-8 mb-12">
+        <div class="relative">
+            <h1 class="text-6xl font-black text-white uppercase tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-gray-500">
+                {{ page_title }}
+            </h1>
+            <div class="flex items-center gap-4">
+                <span class="h-[2px] w-12 bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.6)]"></span>
+                <p class="text-indigo-400/60 text-[10px] font-black uppercase tracking-[0.4em]">Deep Night Collection</p>
+            </div>
         </div>
-    {% endfor %}
-</div>
+    </div>
 
-{% if is_paginated %}
-<div class="mt-16 flex justify-center items-center gap-4">
-    {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
-           class="w-12 h-12 flex items-center justify-center bg-gray-800 rounded-xl hover:bg-gray-700 text-white transition-colors">←</a>
-    {% endif %}
-    <span class="text-gray-400 font-bold">Страница {{ page_obj.number }}</span>
-    {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
-           class="w-12 h-12 flex items-center justify-center bg-gray-800 rounded-xl hover:bg-gray-700 text-white transition-colors">→</a>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-6 gap-y-12">
+        {% for item in content_list %}
+            <div class="group relative" x-data="{ showFullTitle: false }">
+                
+                <div class="relative bg-white/[0.03] border border-white/5 rounded-2xl overflow-hidden backdrop-blur-md transition-all duration-500 group-hover:translate-y-[-8px] group-hover:border-indigo-500/40 group-hover:bg-white/[0.07] group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                    
+                    <a href="{% url 'movie_detail' item.id %}" class="block relative aspect-[2/3] w-full overflow-hidden bg-black/20">
+                        {% if item.poster %}
+                            <img src="{{ item.poster.url }}" alt="{{ item.name }}" 
+                                 class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center bg-indigo-950/20 text-indigo-500/30 text-[10px] font-black uppercase tracking-widest">
+                                No Poster
+                            </div>
+                        {% endif %}
+                        
+                        <div class="absolute top-3 right-3 bg-black/50 backdrop-blur-md border border-white/10 px-2 py-1 rounded-lg">
+                            <span class="text-[10px] font-black text-indigo-400">★ {{ item.average_rating|default:"0.0" }}</span>
+                        </div>
+                    </a>
+
+                    <div class="p-4">
+                        <h3 class="text-[11px] font-black text-white leading-tight uppercase tracking-tight truncate group-hover:text-indigo-400 transition-colors"
+                            @mouseenter="showFullTitle = true" @mouseleave="showFullTitle = false">
+                            {{ item.name }}
+                        </h3>
+                        <div class="flex justify-between items-center mt-3">
+                            <span class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">{{ item.release_year }}</span>
+                            <div class="flex gap-1">
+                                <span class="w-1 h-1 bg-indigo-500/50 rounded-full"></span>
+                                <span class="w-1 h-1 bg-indigo-500/30 rounded-full"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="showFullTitle" 
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:leave="transition ease-in duration-100"
+                     class="absolute z-50 bottom-full left-0 right-0 mb-4 p-3 bg-indigo-600 rounded-xl shadow-[0_10px_30px_rgba(79,70,229,0.4)] pointer-events-none" 
+                     x-cloak>
+                    <p class="text-white text-[11px] font-black uppercase text-center leading-snug tracking-wide">{{ item.name }}</p>
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-indigo-600"></div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-span-full py-32 text-center bg-white/[0.02] border border-dashed border-white/10 rounded-[3rem]">
+                <p class="text-gray-500 text-sm font-black uppercase tracking-[0.3em] mb-4">В этой галактике пусто</p>
+                <a href="{% url 'home' %}" class="text-indigo-500 hover:text-white transition-colors text-xs font-black uppercase tracking-widest">Вернуться к началу</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+    <div class="mt-20 flex justify-center items-center gap-4">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+               class="w-12 h-12 flex items-center justify-center bg-white/5 border border-white/10 rounded-2xl text-white hover:bg-indigo-600 transition-all shadow-xl hover:shadow-indigo-500/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+            </a>
+        {% endif %}
+        
+        <div class="px-6 py-3 bg-white/[0.03] border border-white/10 rounded-2xl backdrop-blur-md">
+            <span class="text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em]">
+                {{ page_obj.number }} <span class="text-gray-600 mx-2">/</span> {{ page_obj.paginator.num_pages }}
+            </span>
+        </div>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+               class="w-12 h-12 flex items-center justify-center bg-white/5 border border-white/10 rounded-2xl text-white hover:bg-indigo-600 transition-all shadow-xl hover:shadow-indigo-500/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </a>
+        {% endif %}
+    </div>
     {% endif %}
 </div>
-{% endif %}
 {% endblock %}

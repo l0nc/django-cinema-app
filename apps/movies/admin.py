@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Movie, Genre, Person
+from .models import Content, Genre, Person
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
@@ -15,7 +15,7 @@ class PersonAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
 
-@admin.register(Movie)
+@admin.register(Content)
 class MovieAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'release_year', 'slug', 'duration', 'created_at')
     list_filter = ('release_year', 'genres', 'type')
